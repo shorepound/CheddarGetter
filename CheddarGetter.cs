@@ -63,9 +63,9 @@ namespace AutoBillingTest
         {
             try
             {
-                _Username = "nathan@yellowpagesunited.com"; //ConfigurationManager.AppSettings["CheddarGetterUser"];
-                _Password = "ff24c54e8a7bab28ddc721af4feae7d2"; //ConfigurationManager.AppSettings["CheddarGetterPassword"];
-                _ProductCode = "AUTO_BILLING_TEST"; //ConfigurationManager.AppSettings["CheddarGetterProductCode"];
+                _Username = "xxxxxxxxxxxxx"; //ConfigurationManager.AppSettings["CheddarGetterUser"];
+                _Password = "xxxxxxxxxxxxxx"; //ConfigurationManager.AppSettings["CheddarGetterPassword"];
+                _ProductCode = "xxxxxxxxxxxxxx"; //ConfigurationManager.AppSettings["CheddarGetterProductCode"];
 
             }
             catch (Exception ex)
