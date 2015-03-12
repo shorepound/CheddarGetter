@@ -39,17 +39,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Confer.CheddarGetter
+namespace AutoBillingTest
 {
 
     public enum PlanCodeEnum
     {
-        Free = 1,
-        Trial,
-        Good,
-        Better,
-        Best,
-        Other
+        Monthly = 1,
+        SemiAnnually,
+        Yearly,
+        Free
     }
 
     public enum ProductItemCode
@@ -100,6 +98,12 @@ namespace Confer.CheddarGetter
         public DateTime CreatedDateTime { get; set; }
     }
 
+    public class Transaction
+    {
+        public Guid? ID { get; set; }
+        public string Response { get; set; }
+    }
+
     public class Invoice
     {
         public Guid ID { get; set; }
@@ -109,6 +113,7 @@ namespace Confer.CheddarGetter
         public Guid? PaidTransactionId { get; set; }
         public DateTime CreatedDateTime { get; set; }
         public List<Charge> Charges { get; set; }
+        public List<Transaction> Transactions { get; set; }
     }
 
     public class SubscriptionItem
@@ -172,7 +177,7 @@ namespace Confer.CheddarGetter
         public string CCLastName { get; set; }
         public string CCNumber { get; set; }
         public string CCExpiration { get; set; }
-        public string CCExpMonth { get; set; } 
+        public string CCExpMonth { get; set; }
         public string CCExpYear { get; set; }
         public string CCCardCode { get; set; }
         public string CCZip { get; set; }
@@ -187,6 +192,18 @@ namespace Confer.CheddarGetter
         public int EachAmount { get; set; }
         public string Description { get; set; }
     }
+
+    public class RefundChargePost
+    {
+        public string InvoiceNumber { get; set; }
+        public decimal RefundAmount { get; set; }
+    }
+
+    public class IssueVoidPost
+    {
+        public string InvoiceNumber { get; set; }
+    }
+
 
     public class PlanUpdatePost
     {

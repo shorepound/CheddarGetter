@@ -40,11 +40,15 @@ using System.Linq;
 using System.Xml.Linq;
 using System.Text;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.IO;
 using System.Configuration;
 using System.Web;
+using System.Xml;
+using System.Xml.Serialization;
 
-namespace Confer.CheddarGetter
+
+namespace AutoBillingTest
 {
     public static class CheddarGetter
     {
@@ -59,9 +63,10 @@ namespace Confer.CheddarGetter
         {
             try
             {
-                _Username = ConfigurationManager.AppSettings["CheddarGetterUser"];
-                _Password = ConfigurationManager.AppSettings["CheddarGetterPassword"];
-                _ProductCode = ConfigurationManager.AppSettings["CheddarGetterProductCode"];
+                _Username = "nathan@yellowpagesunited.com"; //ConfigurationManager.AppSettings["CheddarGetterUser"];
+                _Password = "ff24c54e8a7bab28ddc721af4feae7d2"; //ConfigurationManager.AppSettings["CheddarGetterPassword"];
+                _ProductCode = "AUTO_BILLING_TEST"; //ConfigurationManager.AppSettings["CheddarGetterProductCode"];
+
             }
             catch (Exception ex)
             {
@@ -86,35 +91,35 @@ namespace Confer.CheddarGetter
                 XDocument plansXML = XDocument.Parse(result);
 
                 subscriptionPlansList = (from p in plansXML.Descendants("plan")
-                                         select new SubscriptionPlan
-                                             {
-                                                 ID = (Guid)p.Attribute("id"),
-                                                 Code = (string)p.Attribute("code"),
-                                                 Name = (string)p.Element("name"),
-                                                 Description = (string)p.Element("description"),
-                                                 IsActive = (bool)p.Element("isActive"),
-                                                 TrialDays = (int)p.Element("trialDays"),
-                                                 BillingFrequency = (string)p.Element("billingFrequency"),
-                                                 BillingFrequencyPer = (string)p.Element("billingFrequencyPer"),
-                                                 BillingFrequencyUnit = (string)p.Element("billingFrequencyUnit"),
-                                                 BillingFrequencyQuantity = (string)p.Element("billingFrequencyQuantity"),
-                                                 SetupChargeCode = (string)p.Element("setupChargeCode"),
-                                                 SetupChargeAmount = (float)p.Element("setupChargeAmount"),
-                                                 RecurringChargeCode = (string)p.Element("recurringChargeCode"),
-                                                 RecurringChargeAmount = (float)p.Element("recurringChargeAmount"),
-                                                 CreatedDateTime = (DateTime)p.Element("createdDatetime"),
-                                                 PlanItems = (from i in p.Element("items").Descendants("item")
-                                                              select new PlanItem
-                                                              {
-                                                                  ID = (Guid)i.Attribute("id"),
-                                                                  Code = (string)i.Attribute("code"),
-                                                                  Name = (string)i.Element("name"),
-                                                                  QuantityIncluded = (double)i.Element("quantityIncluded"),
-                                                                  IsPeriodic = (bool)i.Element("isPeriodic"),
-                                                                  OverageAmount = (float)i.Element("overageAmount"),
-                                                                  CreatedDateTime = (DateTime)i.Element("createdDatetime")
-                                                              }).ToList()
-                                             }).ToList();
+                    select new SubscriptionPlan
+                    {
+                        ID = (Guid)p.Attribute("id"),
+                        Code = (string)p.Attribute("code"),
+                        Name = (string)p.Element("name"),
+                        Description = (string)p.Element("description"),
+                        IsActive = (bool)p.Element("isActive"),
+                        TrialDays = (int)p.Element("trialDays"),
+                        BillingFrequency = (string)p.Element("billingFrequency"),
+                        BillingFrequencyPer = (string)p.Element("billingFrequencyPer"),
+                        BillingFrequencyUnit = (string)p.Element("billingFrequencyUnit"),
+                        BillingFrequencyQuantity = (string)p.Element("billingFrequencyQuantity"),
+                        SetupChargeCode = (string)p.Element("setupChargeCode"),
+                        SetupChargeAmount = (float)p.Element("setupChargeAmount"),
+                        RecurringChargeCode = (string)p.Element("recurringChargeCode"),
+                        RecurringChargeAmount = (float)p.Element("recurringChargeAmount"),
+                        CreatedDateTime = (DateTime)p.Element("createdDatetime"),
+                        PlanItems = (from i in p.Element("items").Descendants("item")
+                            select new PlanItem
+                            {
+                                ID = (Guid)i.Attribute("id"),
+                                Code = (string)i.Attribute("code"),
+                                Name = (string)i.Element("name"),
+                                QuantityIncluded = (double)i.Element("quantityIncluded"),
+                                IsPeriodic = (bool)i.Element("isPeriodic"),
+                                OverageAmount = (float)i.Element("overageAmount"),
+                                CreatedDateTime = (DateTime)i.Element("createdDatetime")
+                            }).ToList()
+                    }).ToList();
             }
             catch (Exception ex)
             {
@@ -161,7 +166,8 @@ namespace Confer.CheddarGetter
             Customer customer = new Customer();
 
             string urlBase = "https://cheddargetter.com/xml";
-            string urlPath = string.Format("/customers/get/productCode/{0}/code/{1}", _ProductCode, customerCode);
+            //use id for CG ID or code for unique customer code that we create
+            string urlPath = string.Format("/customers/get/productCode/{0}/id/{1}", _ProductCode, customerCode);
             try
             {
                 string result = getRequest(urlBase, urlPath);
@@ -246,7 +252,9 @@ namespace Confer.CheddarGetter
             }
             catch (Exception ex)
             {
+                
                 throw ex;
+                
             }
 
             return newCustomer;
@@ -264,44 +272,97 @@ namespace Confer.CheddarGetter
 
             try
             {
-                // Create the web request  
-                string urlBase = "https://cheddargetter.com/xml";
-                string urlPath = string.Format("/customers/edit/productCode/{0}/code/{1}", _ProductCode, customer.Code);
-                string postParams = string.Format(
-                    "firstName={0}" +
-                    "&lastName={1}" +
-                    "&email={2}" +
-                    "&company={3}" +
-                    "&notes={4}" +
-                    "&subscription[planCode]={5}" +
-                    "&subscription[ccFirstName]={6}" +
-                    "&subscription[ccLastName]={7}" +
-                    "&subscription[ccNumber]={8}" +
-                    "&subscription[ccExpiration]={9}" +
-                    "&subscription[ccCardCode]={10}" +
-                    "&subscription[ccZip]={11}",
-                    HttpUtility.UrlEncode(customer.FirstName),
-                    HttpUtility.UrlEncode(customer.LastName),
-                    HttpUtility.UrlEncode(customer.Email),
-                    HttpUtility.UrlEncode(customer.Company),
-                    HttpUtility.UrlEncode(customer.Notes),
-                    HttpUtility.UrlEncode(customer.PlanCode.ToString().ToUpper()),
-                    HttpUtility.UrlEncode(customer.CCFirstName),
-                    HttpUtility.UrlEncode(customer.CCLastName),
-                    HttpUtility.UrlEncode(customer.CCNumber),
-                    HttpUtility.UrlEncode(string.Format("{0}/{1}", formatMonth(customer.CCExpMonth), customer.CCExpYear)),
-                    HttpUtility.UrlEncode(customer.CCCardCode),
-                    HttpUtility.UrlEncode(customer.CCZip));
-
-                string result = postRequest(urlBase, urlPath, postParams);
-                XDocument newCustomerXML = XDocument.Parse(result);
-
-                customers = getCustomerList(newCustomerXML);
-
-                if (customers.CustomerList.Count > 0)
+                //we don't want to send an empty cc number 
+                //if the customer isn't updating the card number
+                if (customer.CCNumber != "")
                 {
-                    updatedCustomer = customers.CustomerList[0];
+                    // Create the web request  
+                    string urlBase = "https://cheddargetter.com/xml";
+                    string urlPath = string.Format("/customers/edit/productCode/{0}/code/{1}", _ProductCode, customer.Code);
+                    string postParams = string.Format(
+                        "firstName={0}" +
+                        "&lastName={1}" +
+                        "&email={2}" +
+                        "&company={3}" +
+                        "&notes={4}" +
+                        "&subscription[planCode]={5}" +
+                        "&subscription[ccFirstName]={6}" +
+                        "&subscription[ccLastName]={7}" +
+                        "&subscription[ccNumber]={8}" +
+                        "&subscription[ccExpiration]={9}" +
+                        "&subscription[ccCardCode]={10}" +
+                        "&subscription[ccZip]={11}",
+                        HttpUtility.UrlEncode(customer.FirstName),
+                        HttpUtility.UrlEncode(customer.LastName),
+                        HttpUtility.UrlEncode(customer.Email),
+                        HttpUtility.UrlEncode(customer.Company),
+                        HttpUtility.UrlEncode(customer.Notes),
+                        HttpUtility.UrlEncode(customer.PlanCode.ToString().ToUpper()),
+                        HttpUtility.UrlEncode(customer.CCFirstName),
+                        HttpUtility.UrlEncode(customer.CCLastName),
+                        HttpUtility.UrlEncode(customer.CCNumber),
+                        HttpUtility.UrlEncode(string.Format("{0}/{1}", formatMonth(customer.CCExpMonth), customer.CCExpYear)),
+                        HttpUtility.UrlEncode(customer.CCCardCode),
+                        HttpUtility.UrlEncode(customer.CCZip));
+                    string result = postRequest(urlBase, urlPath, postParams);
+
+                    XDocument newCustomerXML = XDocument.Parse(result);
+
+                    customers = getCustomerList(newCustomerXML);
+
+                    if (customers.CustomerList.Count > 0)
+                    {
+                        updatedCustomer = customers.CustomerList[0];
+                    }
                 }
+                else
+                {
+                    // Create the web request  
+                    string urlBase = "https://cheddargetter.com/xml";
+                    string urlPath = string.Format("/customers/edit/productCode/{0}/code/{1}", _ProductCode, customer.Code);
+                    string postParams = string.Format(
+                        "firstName={0}" +
+                        "&lastName={1}" +
+                        "&email={2}" +
+                        "&company={3}" +
+                        "&notes={4}" +
+                        "&subscription[planCode]={5}" +
+                        "&subscription[ccFirstName]={6}" +
+                        "&subscription[ccLastName]={7}" +
+                        "&subscription[ccExpiration]={8}" +
+                        "&subscription[ccCardCode]={9}" +
+                        "&subscription[ccZip]={10}",
+                        HttpUtility.UrlEncode(customer.FirstName),
+                        HttpUtility.UrlEncode(customer.LastName),
+                        HttpUtility.UrlEncode(customer.Email),
+                        HttpUtility.UrlEncode(customer.Company),
+                        HttpUtility.UrlEncode(customer.Notes),
+                        HttpUtility.UrlEncode(customer.PlanCode.ToString().ToUpper()),
+                        HttpUtility.UrlEncode(customer.CCFirstName),
+                        HttpUtility.UrlEncode(customer.CCLastName),
+                        HttpUtility.UrlEncode(string.Format("{0}/{1}", formatMonth(customer.CCExpMonth), customer.CCExpYear)),
+                        HttpUtility.UrlEncode(customer.CCCardCode),
+                        HttpUtility.UrlEncode(customer.CCZip));
+                    string result = postRequest(urlBase, urlPath, postParams);
+
+                    XDocument newCustomerXML = XDocument.Parse(result);
+
+                    customers = getCustomerList(newCustomerXML);
+
+                    if (customers.CustomerList.Count > 0)
+                    {
+                        updatedCustomer = customers.CustomerList[0];
+                    }
+                }
+                
+                //if (result.IndexOf("Error") > -1)
+                //{
+                    
+                //}
+                //else
+                //{
+                    
+                //}
             }
             catch (Exception ex)
             {
@@ -330,7 +391,7 @@ namespace Confer.CheddarGetter
                     "firstName={0}" +
                     "&lastName={1}" +
                     "&email={2}" +
-                    "&company={3}",
+                    "&company={3}"+
                     "&notes={4}",
                     HttpUtility.UrlEncode(customer.FirstName),
                     HttpUtility.UrlEncode(customer.LastName),
@@ -339,6 +400,7 @@ namespace Confer.CheddarGetter
                     HttpUtility.UrlEncode(customer.Notes));
 
                 string result = postRequest(urlBase, urlPath, postParams);
+
                 XDocument newCustomerXML = XDocument.Parse(result);
 
                 customers = getCustomerList(newCustomerXML);
@@ -529,6 +591,37 @@ namespace Confer.CheddarGetter
             return canceled;
         }
 
+        public static bool DeleteCustomer(string customerCode)
+        {
+            Customers customers = new Customers();
+            Customer deleteCustomer = new Customer();
+            bool deleted = false;
+
+            try
+            {
+                string urlBase = "https://cheddargetter.com/xml";
+                string urlPath = string.Format("/customers/delete/productCode/{0}/code/{1}", _ProductCode, customerCode);
+
+                string result = getRequest(urlBase, urlPath);
+                XDocument newCustomerXML = XDocument.Parse(result);
+
+                customers = getCustomerList(newCustomerXML);
+
+                if (customers.CustomerList.Count > 0)
+                {
+                    deleteCustomer = customers.CustomerList[0];
+                }
+
+                deleted = true;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return deleted;
+        }
+
         /// <summary>
         /// Add an item and set the quantity for a customer
         /// Note: if no quantity is specified then it will increment by 1 by default
@@ -652,6 +745,82 @@ namespace Confer.CheddarGetter
         }
 
         /// <summary>
+        /// Refunds the charge.
+        /// </summary>
+        /// <param name="refund">The refund.</param>
+        /// <returns></returns>
+        public static Customer RefundCharge(RefundChargePost refund)
+        {
+            Customers customers = new Customers();
+            Customer refundCustomer = new Customer();
+
+            try
+            {
+                string urlBase = "https://cheddargetter.com/xml";
+                string urlPath = string.Format("/invoices/refund/productCode/{0}/", _ProductCode);
+                string postParams = string.Format(
+                  "number={0}" +
+                  "&amount={1}",
+                  HttpUtility.UrlEncode(refund.InvoiceNumber),
+                  HttpUtility.UrlEncode(refund.RefundAmount.ToString()));
+
+                string result = postRequest(urlBase, urlPath, postParams);
+                XDocument newCustomerXML = XDocument.Parse(result);
+
+                customers = getCustomerList(newCustomerXML);
+
+                if (customers.CustomerList.Count > 0)
+                {
+                    refundCustomer = customers.CustomerList[0];
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return refundCustomer;
+        }
+
+        /// <summary>
+        /// Issues the void.
+        /// </summary>
+        /// <param name="voidinvoice">The voidinvoice.</param>
+        /// <returns></returns>
+        public static Customer IssueVoid(IssueVoidPost voidinvoice)
+        {
+            Customers customers = new Customers();
+            Customer voidCustomer = new Customer();
+
+            try
+            {
+                string urlBase = "https://cheddargetter.com/xml";
+                string urlPath = string.Format("/invoices/void/productCode/{0}/", _ProductCode);
+                string postParams = string.Format(
+                  "number={0}",
+                  HttpUtility.UrlEncode(voidinvoice.InvoiceNumber));
+
+                string result = postRequest(urlBase, urlPath, postParams);
+                XDocument newCustomerXML = XDocument.Parse(result);
+
+                customers = getCustomerList(newCustomerXML);
+
+                if (customers.CustomerList.Count > 0)
+                {
+                    voidCustomer = customers.CustomerList[0];
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return voidCustomer;
+        }
+
+        /// <summary>
         /// Add a customer charge for a customer
         /// </summary>
         /// <param name="customCharge">A CustomerChargePost object with the customer charge and customer code</param>
@@ -746,8 +915,7 @@ namespace Confer.CheddarGetter
 
                 //Add authentication
                 request.Credentials = new NetworkCredential(_Username, _Password);
-
-                //make into a post
+              
                 request.ContentType = "application/x-www-form-urlencoded";
                 request.Method = "POST";
 
@@ -766,13 +934,69 @@ namespace Confer.CheddarGetter
                         }
                     }
                 }
+
             }
-            catch (Exception ex)
+            catch (WebException wex)
             {
-                throw ex;
+                //HttpWebResponse response = wex.Response as HttpWebResponse;
+
+                //XDocument xDoc = XDocument.Load(response.GetResponseStream());
+                //List<CGError> errorList = new List<CGError>();
+                //errorList = (from e in xDoc.Descendants("errors")
+                //             select new CGError
+                //             {
+                //                 ID = (string)e.Attribute("id"),
+                //                 Code = (string)e.Attribute("code"),
+                //                 AuxCode = (string)e.Attribute("auxCode"),
+                //                 Message = (string)e.Element("error")
+                //             }).ToList();
+
+                //foreach (CGError e in errorList)
+                //{
+                //    result = "Error:" + e.Message.ToString();
+                //}
+
+                throw wex;
             }
 
             return result;
+        }
+
+        private static XmlDocument xmlpostRequest(string urlBase, string urlPath, string postParams)
+        {
+            try
+            {
+                HttpWebRequest request = WebRequest.Create(urlBase + urlPath) as HttpWebRequest;
+
+                request.Credentials = new NetworkCredential(_Username, _Password);
+                request.Method = "POST";
+                request.ContentType = "application/x-www-form-urlencoded";
+
+                byte[] bytes = Encoding.UTF8.GetBytes(postParams);
+                request.ContentLength = bytes.Length;
+
+                using (Stream requestStream = request.GetRequestStream())
+                {
+
+                    requestStream.Write(bytes, 0, bytes.Length);
+
+                    HttpWebResponse response = request.GetResponse() as HttpWebResponse;
+
+
+                    XmlDocument xmlDoc = new XmlDocument();
+                    xmlDoc.Load(response.GetResponseStream());
+                    return (xmlDoc);
+                }
+            }
+            catch (WebException wex)
+            {
+                HttpWebResponse response = wex.Response as HttpWebResponse;
+
+                XmlDocument xmlDoc = new XmlDocument();
+                xmlDoc.Load(response.GetResponseStream());
+                return (xmlDoc);
+                //throw ex;
+            }
         }
 
         /// <summary>
@@ -797,6 +1021,7 @@ namespace Confer.CheddarGetter
                                     FirstName = (string)c.Element("firstName"),
                                     LastName = (string)c.Element("lastName"),
                                     Company = (string)c.Element("company"),
+                                    Notes = (string)c.Element("notes"),
                                     Email = (string)c.Element("email"),
                                     GatewayToken = (string)c.Element("gatewayToken"),
                                     CreatedDateTime = (DateTime)c.Element("createdDatetime"),
@@ -892,6 +1117,30 @@ namespace Confer.CheddarGetter
             return chargeList;
         }
 
+        private static List<Transaction> getTransactions(XElement transactions)
+        {
+            List<Transaction> transList = new List<Transaction>();
+
+            try
+            {
+                if (transactions != null && transactions.Descendants("transaction") != null)
+                {
+                    transList = (from tr in transactions.Descendants("transaction")
+                                 select new Transaction
+                                  {
+                                      ID = string.IsNullOrEmpty(tr.Attribute("id").Value) ? (Guid?)null : (Guid?)tr.Attribute("id"),
+                                      Response = (string)tr.Element("response")
+                                  }).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return transList;
+        }
+
         /// <summary>
         /// Get a list of invoices based on an invoice XML node in a XElement object
         /// </summary>
@@ -914,7 +1163,8 @@ namespace Confer.CheddarGetter
                                        BillingDateTime = (DateTime)i.Element("billingDatetime"),
                                        PaidTransactionId = string.IsNullOrEmpty(i.Element("paidTransactionId").Value) ? (Guid?)null : (Guid?)i.Element("paidTransactionId"),
                                        CreatedDateTime = (DateTime)i.Element("createdDatetime"),
-                                       Charges = getCharges(i.Element("charges"))
+                                       Charges = getCharges(i.Element("charges")),
+                                       Transactions = getTransactions(i.Element("transactions"))
                                    }).ToList();
                 }
             }
