@@ -154,6 +154,38 @@ namespace AutoBillingTest
 
             return customers.CustomerList;
         }
+        
+        public static List<Invoice> GetInvoices(string customerID)
+        {
+            Invoices invoices = new Invoices();
+
+            string urlBase = "https://cheddargetter.com/xml";
+            string urlPath = string.Format("/customers/get/productCode/{0}/id/{1}", _ProductCode, customerID);
+
+            try
+            {
+                string result = getRequest(urlBase, urlPath);
+
+                XDocument invoicesXML = XDocument.Parse(result);
+
+                invoices = getInvoiceList(invoicesXML);
+            }
+            catch (WebException ex)
+            {
+                HttpWebResponse response = (HttpWebResponse)ex.Response;
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    return null;
+                }
+                throw ex;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return invoices.InvoiceList;
+        }
 
         /// <summary>
         /// Get a particular customer based on a passed in customer code and your product code
@@ -1048,6 +1080,52 @@ namespace AutoBillingTest
             }
 
             return customers;
+        }
+        
+        /// <summary>
+        /// Gets the invoice list.
+        /// </summary>
+        /// <param name="invoicesXML">The invoices XML.</param>
+        /// <returns></returns>
+        private static Invoices getInvoiceList(XDocument invoicesXML)
+        {
+            Invoices invoices = new Invoices();
+            List<Invoice> invoiceList = new List<Invoice>();
+            List<CGError> errorList = new List<CGError>();
+
+            try
+            {
+                invoiceList = (from i in invoicesXML.Descendants("invoice")
+                                select new Invoice
+                                {
+                                    ID = (Guid)i.Attribute("id"),
+                                    Number = (int)i.Element("number"),
+                                    Type = (string)i.Element("type"),
+                                    CreatedDateTime = (DateTime)i.Element("createdDatetime"),
+                                    BillingDateTime = (DateTime)i.Element("billingDatetime"),
+                                    Transactions = getTransactions(i.Element("transactions")),
+                                    Charges = getCharges(i.Element("charges")),
+                                }).ToList();
+
+                errorList = (from e in invoicesXML.Descendants("errors")
+                             select new CGError
+                             {
+                                 ID = (string)e.Attribute("id"),
+                                 Code = (string)e.Attribute("code"),
+                                 AuxCode = (string)e.Attribute("auxCode"),
+                                 Message = (string)e.Element("error")
+                             }).ToList();
+
+                invoices.InvoiceList = invoiceList;
+                invoices.ErrorList = errorList;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return invoices;
+
         }
 
         /// <summary>

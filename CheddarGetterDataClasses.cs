@@ -148,6 +148,12 @@ namespace AutoBillingTest
         public List<Customer> CustomerList { get; set; }
         public List<CGError> ErrorList { get; set; }
     }
+    
+    public class Invoices
+    {
+        public List<Invoice> InvoiceList { get; set; }
+        public List<CGError> ErrorList { get; set; }
+    }
 
     public class Customer
     {
