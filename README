@@ -70,6 +70,8 @@ GetCustomer - Gets a specific customer
 
 GetCustomers - Gets a list of all customers
 
+GetInvoices - Gets all invoices for a specific customer
+
 GetSubscriptionPlans - Gets a list of all subscription plans
 
 RemoveItem - Removes an item quantity (decrements by 1 if the quantity is not specified)
