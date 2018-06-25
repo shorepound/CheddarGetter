@@ -1,37 +1,37 @@
 ﻿/*  CheddarGetter C# API Wrappper
- * 
+ *
  *  Version: 1.0
  *  Author: John Siladie <john [at] getconfer [dot] com>
- *  
+ *
  *  Copyright (c) 2010, Confer
  *  All rights reserved.
- *  
- *  
- *  Redistribution and use in source and binary forms, with or without modification, are 
+ *
+ *
+ *  Redistribution and use in source and binary forms, with or without modification, are
  *  permitted provided that the following conditions are met:
- *  
- *  - Redistributions of source code must retain the above copyright notice, this list 
+ *
+ *  - Redistributions of source code must retain the above copyright notice, this list
  *    of conditions and the following disclaimer.
- *  - Redistributions in binary form must reproduce the above copyright notice, this list 
- *    of conditions and the following disclaimer in the documentation and/or other 
+ *  - Redistributions in binary form must reproduce the above copyright notice, this list
+ *    of conditions and the following disclaimer in the documentation and/or other
  *    materials provided with the distribution.
- *  - Neither the name of the Confer nor the names of its contributors may be 
- *    used to endorse or promote products derived from this software without specific 
+ *  - Neither the name of the Confer nor the names of its contributors may be
+ *    used to endorse or promote products derived from this software without specific
  *    prior written permission.
- * 
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
- *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
- *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. 
- *  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, 
- *  INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
- *  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
- *  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
- *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ *  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ *  INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ *  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ *  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
- *  
+ *
  *  For more information please visit our blog at http://blog.getconfer.com/
- *  
+ *
  */
 
 using System;
@@ -84,7 +84,7 @@ namespace AutoBillingTest
 
             try
             {
-                string urlBase = "https://cheddargetter.com/xml";
+                string urlBase = "https://www.getcheddar.com/xml";
                 string urlPath = string.Format("/plans/get/productCode/{0}", _ProductCode);
 
                 string result = getRequest(urlBase, urlPath);
@@ -139,7 +139,7 @@ namespace AutoBillingTest
 
             try
             {
-                string urlBase = "https://cheddargetter.com/xml";
+                string urlBase = "https://www.getcheddar.com/xml";
                 string urlPath = string.Format("/customers/get/productCode/{0}", _ProductCode);
 
                 string result = getRequest(urlBase, urlPath);
@@ -154,12 +154,12 @@ namespace AutoBillingTest
 
             return customers.CustomerList;
         }
-        
+
         public static List<Invoice> GetInvoices(string customerID)
         {
             Invoices invoices = new Invoices();
 
-            string urlBase = "https://cheddargetter.com/xml";
+            string urlBase = "https://www.getcheddar.com/xml";
             string urlPath = string.Format("/customers/get/productCode/{0}/id/{1}", _ProductCode, customerID);
 
             try
@@ -197,7 +197,7 @@ namespace AutoBillingTest
             Customers customers = new Customers();
             Customer customer = new Customer();
 
-            string urlBase = "https://cheddargetter.com/xml";
+            string urlBase = "https://www.getcheddar.com/xml";
             //use id for CG ID or code for unique customer code that we create
             string urlPath = string.Format("/customers/get/productCode/{0}/id/{1}", _ProductCode, customerCode);
             try
@@ -242,7 +242,7 @@ namespace AutoBillingTest
 
             try
             {
-                string urlBase = "https://cheddargetter.com/xml";
+                string urlBase = "https://www.getcheddar.com/xml";
                 string urlPath = string.Format("/customers/new/productCode/{0}", _ProductCode);
                 string postParams = string.Format(
                     "code={0}" +
@@ -284,9 +284,9 @@ namespace AutoBillingTest
             }
             catch (Exception ex)
             {
-                
+
                 throw ex;
-                
+
             }
 
             return newCustomer;
@@ -304,12 +304,12 @@ namespace AutoBillingTest
 
             try
             {
-                //we don't want to send an empty cc number 
+                //we don't want to send an empty cc number
                 //if the customer isn't updating the card number
                 if (customer.CCNumber != "")
                 {
-                    // Create the web request  
-                    string urlBase = "https://cheddargetter.com/xml";
+                    // Create the web request
+                    string urlBase = "https://www.getcheddar.com/xml";
                     string urlPath = string.Format("/customers/edit/productCode/{0}/code/{1}", _ProductCode, customer.Code);
                     string postParams = string.Format(
                         "firstName={0}" +
@@ -349,8 +349,8 @@ namespace AutoBillingTest
                 }
                 else
                 {
-                    // Create the web request  
-                    string urlBase = "https://cheddargetter.com/xml";
+                    // Create the web request
+                    string urlBase = "https://www.getcheddar.com/xml";
                     string urlPath = string.Format("/customers/edit/productCode/{0}/code/{1}", _ProductCode, customer.Code);
                     string postParams = string.Format(
                         "firstName={0}" +
@@ -386,14 +386,14 @@ namespace AutoBillingTest
                         updatedCustomer = customers.CustomerList[0];
                     }
                 }
-                
+
                 //if (result.IndexOf("Error") > -1)
                 //{
-                    
+
                 //}
                 //else
                 //{
-                    
+
                 //}
             }
             catch (Exception ex)
@@ -416,8 +416,8 @@ namespace AutoBillingTest
 
             try
             {
-                // Create the web request  
-                string urlBase = "https://cheddargetter.com/xml";
+                // Create the web request
+                string urlBase = "https://www.getcheddar.com/xml";
                 string urlPath = string.Format("/customers/edit-customer/productCode/{0}/code/{1}", _ProductCode, customer.Code);
                 string postParams = string.Format(
                     "firstName={0}" +
@@ -462,8 +462,8 @@ namespace AutoBillingTest
 
             try
             {
-                // Create the web request  
-                string urlBase = "https://cheddargetter.com/xml";
+                // Create the web request
+                string urlBase = "https://www.getcheddar.com/xml";
                 string urlPath = string.Format("/customers/edit-subscription/productCode/{0}/code/{1}", _ProductCode, customer.Code);
 
                 //note: expiration date must be in MM/YYYY format
@@ -516,8 +516,8 @@ namespace AutoBillingTest
 
             try
             {
-                // Create the web request  
-                string urlBase = "https://cheddargetter.com/xml";
+                // Create the web request
+                string urlBase = "https://www.getcheddar.com/xml";
                 string urlPath = string.Format("/customers/edit-subscription/productCode/{0}/code/{1}", _ProductCode, customer.Code);
 
                 //note: expiration date must be in MM/YYYY format
@@ -562,8 +562,8 @@ namespace AutoBillingTest
 
             try
             {
-                // Create the web request  
-                string urlBase = "https://cheddargetter.com/xml";
+                // Create the web request
+                string urlBase = "https://www.getcheddar.com/xml";
                 string urlPath = string.Format("/customers/edit-subscription/productCode/{0}/code/{1}", _ProductCode, customerCode);
 
                 //note: expiration date must be in MM/YYYY format
@@ -600,7 +600,7 @@ namespace AutoBillingTest
 
             try
             {
-                string urlBase = "https://cheddargetter.com/xml";
+                string urlBase = "https://www.getcheddar.com/xml";
                 string urlPath = string.Format("/customers/cancel/productCode/{0}/code/{1}", _ProductCode, customerCode);
 
                 string result = getRequest(urlBase, urlPath);
@@ -631,7 +631,7 @@ namespace AutoBillingTest
 
             try
             {
-                string urlBase = "https://cheddargetter.com/xml";
+                string urlBase = "https://www.getcheddar.com/xml";
                 string urlPath = string.Format("/customers/delete/productCode/{0}/code/{1}", _ProductCode, customerCode);
 
                 string result = getRequest(urlBase, urlPath);
@@ -669,7 +669,7 @@ namespace AutoBillingTest
 
             try
             {
-                string urlBase = "https://cheddargetter.com/xml";
+                string urlBase = "https://www.getcheddar.com/xml";
                 string urlPath = string.Format("/customers/add-item-quantity/productCode/{0}/code/{1}/itemCode/{2}", _ProductCode, customerCode, itemCode);
                 string postParams = "";
 
@@ -711,7 +711,7 @@ namespace AutoBillingTest
 
             try
             {
-                string urlBase = "https://cheddargetter.com/xml";
+                string urlBase = "https://www.getcheddar.com/xml";
                 string urlPath = string.Format("/customers/remove-item-quantity/productCode/{0}/code/{1}/itemCode/{2}", _ProductCode, customerCode, itemCode);
                 string postParams = "";
 
@@ -753,7 +753,7 @@ namespace AutoBillingTest
 
             try
             {
-                string urlBase = "https://cheddargetter.com/xml";
+                string urlBase = "https://www.getcheddar.com/xml";
                 string urlPath = string.Format("/customers/set-item-quantity/productCode/{0}/code/{1}/itemCode/{2}", _ProductCode, customerCode, itemCode.ToString());
                 string postParams = string.Format("quantity={0}", HttpUtility.UrlEncode(quantityToSet.ToString()));
 
@@ -788,7 +788,7 @@ namespace AutoBillingTest
 
             try
             {
-                string urlBase = "https://cheddargetter.com/xml";
+                string urlBase = "https://www.getcheddar.com/xml";
                 string urlPath = string.Format("/invoices/refund/productCode/{0}/", _ProductCode);
                 string postParams = string.Format(
                   "number={0}" +
@@ -827,7 +827,7 @@ namespace AutoBillingTest
 
             try
             {
-                string urlBase = "https://cheddargetter.com/xml";
+                string urlBase = "https://www.getcheddar.com/xml";
                 string urlPath = string.Format("/invoices/void/productCode/{0}/", _ProductCode);
                 string postParams = string.Format(
                   "number={0}",
@@ -864,7 +864,7 @@ namespace AutoBillingTest
 
             try
             {
-                string urlBase = "https://cheddargetter.com/xml";
+                string urlBase = "https://www.getcheddar.com/xml";
                 string urlPath = string.Format("/customers/set-item-quantity/productCode/{0}/code/{1}/itemCode/{2}", _ProductCode, customCharge.CustomerCode, customCharge.ItemCode);
                 string postParams = string.Format(
                   "chargeCode={0}" +
@@ -912,10 +912,10 @@ namespace AutoBillingTest
                 //Add authentication
                 request.Credentials = new NetworkCredential(_Username, _Password);
 
-                // Get response  
+                // Get response
                 using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
                 {
-                    // Get the response stream  
+                    // Get the response stream
                     StreamReader reader = new StreamReader(response.GetResponseStream());
 
                     result = reader.ReadToEnd();
@@ -947,7 +947,7 @@ namespace AutoBillingTest
 
                 //Add authentication
                 request.Credentials = new NetworkCredential(_Username, _Password);
-              
+
                 request.ContentType = "application/x-www-form-urlencoded";
                 request.Method = "POST";
 
@@ -1035,7 +1035,7 @@ namespace AutoBillingTest
         /// Get the customer list and any associated CG errors from a XDocument (customer XML)
         /// </summary>
         /// <param name="customersXML">A XDocument that contains customer XML data</param>
-        /// <returns>A Customers object (which is a list of customers and any associated GC errors) 
+        /// <returns>A Customers object (which is a list of customers and any associated GC errors)
         /// that is built from the parsed XDocument</returns>
         private static Customers getCustomerList(XDocument customersXML)
         {
@@ -1081,7 +1081,7 @@ namespace AutoBillingTest
 
             return customers;
         }
-        
+
         /// <summary>
         /// Gets the invoice list.
         /// </summary>
