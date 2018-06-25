@@ -1055,6 +1055,7 @@ namespace AutoBillingTest
                                     Company = (string)c.Element("company"),
                                     Notes = (string)c.Element("notes"),
                                     Email = (string)c.Element("email"),
+                                    MetaDataItems = getMetaDataList(c.Element("metaData")),
                                     GatewayToken = (string)c.Element("gatewayToken"),
                                     CreatedDateTime = (DateTime)c.Element("createdDatetime"),
                                     ModifiedDateTime = (DateTime)c.Element("modifiedDatetime"),
@@ -1252,6 +1253,33 @@ namespace AutoBillingTest
             }
 
             return invoiceList;
+        }
+
+        private static List<MetaDataItem> getMetaDataList(XElement metadata)
+        {
+            List<MetaDataItem> metaDataList = new List<MetaDataItem>();
+
+            try
+            {
+                if (metadata != null && metadata.Descendants("metaData") != null)
+                {
+                    metaDataList = (from s in metadata.Descendants("metaDatum")
+                                    select new MetaDataItem
+                                    {
+                                        Name = (string)s.Element("name"),
+                                        Value = (string)s.Element("value"),
+                                        CreatedDateTime = (DateTime)s.Element("createdDatetime"),
+                                        ModifiedDateTime = (DateTime)s.Element("modifiedDatetime"),
+                                    }).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+
+            return metaDataList;
         }
 
         /// <summary>
